@@ -18,21 +18,24 @@ import (
 )
 
 const (
-	boshDeploymentNameLabel = model.MetaLabelPrefix + "bosh_deployment"
-	boshJobProcessNameLabel = model.MetaLabelPrefix + "bosh_job_process_name"
+	boshDeploymentNameLabel  = model.MetaLabelPrefix + "bosh_deployment"
+	boshManifestVersionLabel = model.MetaLabelPrefix + "bosh_manifest_version"
+	boshJobProcessNameLabel  = model.MetaLabelPrefix + "bosh_job_process_name"
 )
 
 type LabelGroups map[LabelGroupKey][]string
 
 type LabelGroupKey struct {
-	DeploymentName string
-	ProcessName    string
+	DeploymentName  string
+	ManifestVersion string
+	ProcessName     string
 }
 
 func (k *LabelGroupKey) Labels() model.LabelSet {
 	return model.LabelSet{
-		model.LabelName(boshDeploymentNameLabel): model.LabelValue(k.DeploymentName),
-		model.LabelName(boshJobProcessNameLabel): model.LabelValue(k.ProcessName),
+		model.LabelName(boshDeploymentNameLabel):  model.LabelValue(k.DeploymentName),
+		model.LabelName(boshManifestVersionLabel): model.LabelValue(k.ManifestVersion),
+		model.LabelName(boshJobProcessNameLabel):  model.LabelValue(k.ProcessName),
 	}
 }
 
@@ -128,8 +131,9 @@ func (c *ServiceDiscoveryCollector) getLabelGroupKey(
 	process deployments.Process,
 ) LabelGroupKey {
 	return LabelGroupKey{
-		DeploymentName: deployment.Name,
-		ProcessName:    process.Name,
+		DeploymentName:  deployment.Name,
+		ManifestVersion: deployment.ManifestVersion,
+		ProcessName:     process.Name,
 	}
 }
 

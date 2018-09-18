@@ -9,6 +9,7 @@ import (
 	"github.com/prometheus/common/log"
 
 	"github.com/bosh-prometheus/bosh_exporter/filters"
+	"gopkg.in/yaml.v2"
 )
 
 type Fetcher struct {
@@ -71,6 +72,12 @@ func (f *Fetcher) fetchDeploymentInfo(deployment director.Deployment) (*Deployme
 		return deploymentInfo, err
 	}
 	deploymentInfo.Stemcells = stemcells
+
+	manifestVersion, err := f.fetchManifestVersion(deployment)
+	if err != nil {
+		return deploymentInfo, err
+	}
+	deploymentInfo.ManifestVersion = manifestVersion
 
 	return deploymentInfo, nil
 }
@@ -198,4 +205,20 @@ func (f *Fetcher) fetchDeploymentStemcells(deployment director.Deployment) ([]St
 	}
 
 	return deploymentStemcells, nil
+}
+
+func (f *Fetcher) fetchManifestVersion(deployment director.Deployment) (string, error) {
+	log.Debugf("Reading manifest for deployment `%s`:", deployment.Name())
+	manifest, err := deployment.Manifest()
+	if err != nil {
+		return "", fmt.Errorf("Error while reading manifest for deployment `%s`: %v", deployment.Name(), err)
+	}
+
+	manifestParse := struct {
+		ManifestVersion string `yaml:"manifest_version"`
+	}{}
+
+	yaml.Unmarshal([]byte(manifest), &manifestParse)
+
+	return manifestParse.ManifestVersion, nil
 }

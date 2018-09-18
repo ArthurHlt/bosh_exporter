@@ -33,7 +33,7 @@ func NewDeploymentsCollector(
 				"bosh_uuid":   boshUUID,
 			},
 		},
-		[]string{"bosh_deployment", "bosh_release_name", "bosh_release_version"},
+		[]string{"bosh_deployment", "bosh_manifest_version", "bosh_release_name", "bosh_release_version"},
 	)
 
 	deploymentStemcellInfoMetric := prometheus.NewGaugeVec(
@@ -48,7 +48,7 @@ func NewDeploymentsCollector(
 				"bosh_uuid":   boshUUID,
 			},
 		},
-		[]string{"bosh_deployment", "bosh_stemcell_name", "bosh_stemcell_version", "bosh_stemcell_os_name"},
+		[]string{"bosh_deployment", "bosh_manifest_version", "bosh_stemcell_name", "bosh_stemcell_version", "bosh_stemcell_os_name"},
 	)
 
 	lastDeploymentsScrapeTimestampMetric := prometheus.NewGauge(
@@ -125,6 +125,7 @@ func (c *DeploymentsCollector) reportDeploymentReleaseInfoMetrics(
 	for _, release := range deployment.Releases {
 		c.deploymentReleaseInfoMetric.WithLabelValues(
 			deployment.Name,
+			deployment.ManifestVersion,
 			release.Name,
 			release.Version,
 		).Set(float64(1))
@@ -138,6 +139,7 @@ func (c *DeploymentsCollector) reportDeploymentStemcellInfoMetrics(
 	for _, stemcell := range deployment.Stemcells {
 		c.deploymentStemcellInfoMetric.WithLabelValues(
 			deployment.Name,
+			deployment.ManifestVersion,
 			stemcell.Name,
 			stemcell.Version,
 			stemcell.OSName,

@@ -1,10 +1,11 @@
 package deployments
 
 type DeploymentInfo struct {
-	Name      string
-	Instances []Instance
-	Releases  []Release
-	Stemcells []Stemcell
+	Name            string
+	Instances       []Instance
+	Releases        []Release
+	Stemcells       []Stemcell
+	ManifestVersion string
 }
 
 type Instance struct {

@@ -119,7 +119,9 @@ var _ = Describe("ServiceDiscoveryCollector", func() {
 	Describe("Collect", func() {
 		var (
 			deployment1Name     = "fake-deployment-1-name"
+			manifestVersion1    = "v1.0.0"
 			deployment2Name     = "fake-deployment-2-name"
+			manifestVersion2    = ""
 			job1Name            = "fake-job-1-name"
 			job2Name            = "fake-job-2-name"
 			job1AZ              = "fake-job-1-az"
@@ -129,9 +131,9 @@ var _ = Describe("ServiceDiscoveryCollector", func() {
 			jobProcess1Name     = "fake-process-1-name"
 			jobProcess2Name     = "fake-process-2-name"
 			targetGroupsContent = `[
-				{"targets":["1.2.3.4"],"labels":{"__meta_bosh_deployment":"fake-deployment-1-name","__meta_bosh_job_process_name":"fake-process-1-name"}},
-				{"targets":["1.2.3.4"],"labels":{"__meta_bosh_deployment":"fake-deployment-1-name","__meta_bosh_job_process_name":"fake-process-2-name"}},
-				{"targets":["5.6.7.8"],"labels":{"__meta_bosh_deployment":"fake-deployment-2-name","__meta_bosh_job_process_name":"fake-process-2-name"}}
+				{"targets":["1.2.3.4"],"labels":{"__meta_bosh_deployment":"fake-deployment-1-name","__meta_bosh_manifest_version":"v1.0.0","__meta_bosh_job_process_name":"fake-process-1-name"}},
+				{"targets":["1.2.3.4"],"labels":{"__meta_bosh_deployment":"fake-deployment-1-name","__meta_bosh_manifest_version":"v1.0.0","__meta_bosh_job_process_name":"fake-process-2-name"}},
+				{"targets":["5.6.7.8"],"labels":{"__meta_bosh_deployment":"fake-deployment-2-name","__meta_bosh_manifest_version":"","__meta_bosh_job_process_name":"fake-process-2-name"}}
 			]`
 
 			deployment1Processes []deployments.Process
@@ -180,13 +182,15 @@ var _ = Describe("ServiceDiscoveryCollector", func() {
 			}
 
 			deployment1Info = deployments.DeploymentInfo{
-				Name:      deployment1Name,
-				Instances: deployment1Instances,
+				Name:            deployment1Name,
+				ManifestVersion: manifestVersion1,
+				Instances:       deployment1Instances,
 			}
 
 			deployment2Info = deployments.DeploymentInfo{
-				Name:      deployment2Name,
-				Instances: deployment2Instances,
+				Name:            deployment2Name,
+				ManifestVersion: manifestVersion2,
+				Instances:       deployment2Instances,
 			}
 
 			deploymentsInfo = []deployments.DeploymentInfo{deployment1Info, deployment2Info}

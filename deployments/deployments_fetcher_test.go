@@ -186,12 +186,15 @@ var _ = Describe("Fetcher", func() {
 				StemcellsStub:     func() ([]director.Stemcell, error) { return stemcells, nil },
 			}
 
+			deployment.(*directorfakes.FakeDeployment).ManifestReturns(`manifest_version: v1.0.0`, nil)
+
 			deployments = []director.Deployment{deployment}
 			boshClient.DeploymentsReturns(deployments, nil)
 
 			expectedDeploymentsInfo = []DeploymentInfo{
 				DeploymentInfo{
-					Name: deploymentName,
+					Name:            deploymentName,
+					ManifestVersion: "v1.0.0",
 					Instances: []Instance{
 						Instance{
 							AgentID:            agentID,

@@ -31,6 +31,7 @@ var _ = Describe("DeploymentsCollector", func() {
 		lastDeploymentsScrapeDurationSecondsMetric prometheus.Gauge
 
 		deploymentName  = "fake-deployment-name"
+		manifestVersion = "v1.0.0"
 		releaseName     = "fake-release-name"
 		releaseVersion  = "1.2.3"
 		stemcellName    = "fake-stemcell-name"
@@ -56,11 +57,12 @@ var _ = Describe("DeploymentsCollector", func() {
 					"bosh_uuid":   boshUUID,
 				},
 			},
-			[]string{"bosh_deployment", "bosh_release_name", "bosh_release_version"},
+			[]string{"bosh_deployment", "bosh_manifest_version", "bosh_release_name", "bosh_release_version"},
 		)
 
 		deploymentReleaseInfoMetric.WithLabelValues(
 			deploymentName,
+			manifestVersion,
 			releaseName,
 			releaseVersion,
 		).Set(float64(1))
@@ -77,11 +79,12 @@ var _ = Describe("DeploymentsCollector", func() {
 					"bosh_uuid":   boshUUID,
 				},
 			},
-			[]string{"bosh_deployment", "bosh_stemcell_name", "bosh_stemcell_version", "bosh_stemcell_os_name"},
+			[]string{"bosh_deployment", "bosh_manifest_version", "bosh_stemcell_name", "bosh_stemcell_version", "bosh_stemcell_os_name"},
 		)
 
 		deploymentStemcellInfoMetric.WithLabelValues(
 			deploymentName,
+			manifestVersion,
 			stemcellName,
 			stemcellVersion,
 			stemcellOSName,
@@ -141,6 +144,7 @@ var _ = Describe("DeploymentsCollector", func() {
 		It("returns a deployment_release_info description", func() {
 			Eventually(descriptions).Should(Receive(Equal(deploymentReleaseInfoMetric.WithLabelValues(
 				deploymentName,
+				manifestVersion,
 				releaseName,
 				releaseVersion,
 			).Desc())))
@@ -149,6 +153,7 @@ var _ = Describe("DeploymentsCollector", func() {
 		It("returns a deployment_stemcell_info metric description", func() {
 			Eventually(descriptions).Should(Receive(Equal(deploymentStemcellInfoMetric.WithLabelValues(
 				deploymentName,
+				manifestVersion,
 				stemcellName,
 				stemcellVersion,
 				stemcellOSName,
@@ -189,9 +194,10 @@ var _ = Describe("DeploymentsCollector", func() {
 
 		BeforeEach(func() {
 			deploymentInfo = deployments.DeploymentInfo{
-				Name:      deploymentName,
-				Releases:  releases,
-				Stemcells: stemcells,
+				Name:            deploymentName,
+				ManifestVersion: manifestVersion,
+				Releases:        releases,
+				Stemcells:       stemcells,
 			}
 			deploymentsInfo = []deployments.DeploymentInfo{deploymentInfo}
 
@@ -210,6 +216,7 @@ var _ = Describe("DeploymentsCollector", func() {
 		It("returns a deployment_release_info metric", func() {
 			Eventually(metrics).Should(Receive(PrometheusMetric(deploymentReleaseInfoMetric.WithLabelValues(
 				deploymentName,
+				manifestVersion,
 				releaseName,
 				releaseVersion,
 			))))
@@ -219,6 +226,7 @@ var _ = Describe("DeploymentsCollector", func() {
 		It("returns a deployment_stemcell_info metric", func() {
 			Eventually(metrics).Should(Receive(PrometheusMetric(deploymentStemcellInfoMetric.WithLabelValues(
 				deploymentName,
+				manifestVersion,
 				stemcellName,
 				stemcellVersion,
 				stemcellOSName,
@@ -248,6 +256,7 @@ var _ = Describe("DeploymentsCollector", func() {
 			It("should not return a deployment_release_info metric", func() {
 				Consistently(metrics).ShouldNot(Receive(PrometheusMetric(deploymentReleaseInfoMetric.WithLabelValues(
 					deploymentName,
+					manifestVersion,
 					releaseName,
 					releaseVersion,
 				))))
@@ -264,6 +273,7 @@ var _ = Describe("DeploymentsCollector", func() {
 			It("should not return a deployment_stemcell_info metric", func() {
 				Consistently(metrics).ShouldNot(Receive(PrometheusMetric(deploymentStemcellInfoMetric.WithLabelValues(
 					deploymentName,
+					manifestVersion,
 					stemcellName,
 					stemcellVersion,
 					stemcellOSName,
